@@ -1,4 +1,4 @@
-#to start the Server with Git Bash you have to type in: python -m streamlit run src/ui_device.py
+
 
 import streamlit as st
 from queries import find_devices
