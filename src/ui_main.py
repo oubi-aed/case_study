@@ -4,10 +4,11 @@ import streamlit as st
 from queries import find_devices
 from devices import Device
 
-from ui_device import ui_dev
-from ui_users import ui_use
-from ui_maintenance_management import ui_maintenance_manage
-from ui_reservation_system import ui_reservation_sys
+from ui_device import ui_device
+from ui_users import ui_users
+from ui_maintenance_management import ui_maintenance_management
+from ui_reservation_system import ui_reservation_system
+
 
 
 
@@ -18,17 +19,17 @@ import streamlit as st
 
 page = st.sidebar.selectbox("Navigation", ["Geräte", "Nutzer", "Wartungsmanagement", "Reserviersystem"])
 if page == "Geräte":
-    ui_dev()
+    ui_device()
 
 
 elif page == "Nutzer":
-    ui_use()
+    ui_users()
 
 elif page == "Wartungsmanagement":
-    ui_maintenance_manage()
+    ui_maintenance_management()
 
 elif page == "Reserviersystem":
-    ui_reservation_sys()
+    ui_reservation_system()
 
 
 st.write("Session State:")

@@ -5,7 +5,7 @@ from queries import find_devices
 from devices import Device
 
 
-def ui_use():
+def ui_users():
 
     # Eine Überschrift der ersten Ebene
     st.write("# Gerätemanagement")
@@ -19,7 +19,7 @@ def ui_use():
     if devices_in_db:
         current_device_name = st.selectbox(
             'Gerät auswählen',
-            options=devices_in_db, key="sbDevice")
+            options=devices_in_db, key="sbDevice_users")
 
         if current_device_name in devices_in_db:
             loaded_device = Device.find_by_attribute("device_name", current_device_name)
@@ -49,4 +49,4 @@ def ui_use():
     st.write("Session State:")
     st.session_state
 
-ui_use()
+ui_users()

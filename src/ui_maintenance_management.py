@@ -5,7 +5,7 @@ from queries import find_devices
 from devices import Device
 
 
-def ui_maintenance_manage():
+def ui_maintenance_management():
 
     # Eine Überschrift der ersten Ebene
     st.write("# Gerätemanagement")
@@ -19,7 +19,7 @@ def ui_maintenance_manage():
     if devices_in_db:
         current_device_name = st.selectbox(
             'Gerät auswählen',
-            options=devices_in_db, key="sbDevice")
+            options=devices_in_db, key="sbDevice_maintenance")
 
         if current_device_name in devices_in_db:
             loaded_device = Device.find_by_attribute("device_name", current_device_name)
@@ -28,7 +28,7 @@ def ui_maintenance_manage():
             else:
                 st.error("Device not found in the database.")
 
-            with st.form("Device"):
+            with st.form(key="device_form"):
                 st.write(loaded_device.device_name)
 
                 text_input_val = st.text_input("Geräte-Verantwortlicher", value=loaded_device.managed_by_user_id)
@@ -49,4 +49,4 @@ def ui_maintenance_manage():
     st.write("Session State:")
     st.session_state
 
-ui_maintenance_manage()
+ui_maintenance_management()

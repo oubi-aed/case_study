@@ -4,7 +4,7 @@ import streamlit as st
 from queries import find_devices
 from devices import Device
 
-def ui_dev():
+def ui_device():
 
     # Eine Überschrift der ersten Ebene
     st.write("# Gerätemanagement")
@@ -18,7 +18,7 @@ def ui_dev():
     if devices_in_db:
         current_device_name = st.selectbox(
             'Gerät auswählen',
-            options=devices_in_db, key="sbDevice")
+            options=devices_in_db, key="sbDevice_dev")
 
         if current_device_name in devices_in_db:
             loaded_device = Device.find_by_attribute("device_name", current_device_name)
@@ -48,4 +48,4 @@ def ui_dev():
     st.write("Session State:")
     st.session_state
 
-ui_dev()
+ui_device()
