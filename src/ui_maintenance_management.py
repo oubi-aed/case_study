@@ -5,7 +5,7 @@ from queries import find_devices
 from devices import Device
 
 
-def ui_maintenance_management():
+def ui_maintenance_manage():
 
     # Eine Überschrift der ersten Ebene
     st.write("# Gerätemanagement")
@@ -49,4 +49,4 @@ def ui_maintenance_management():
     st.write("Session State:")
     st.session_state
 
-ui_maintenance_management()
+ui_maintenance_manage()

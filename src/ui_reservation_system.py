@@ -4,7 +4,7 @@ import streamlit as st
 from queries import find_devices
 from devices import Device
 
-def ui_reservation_system():
+def ui_reservation_sys():
 
     # Eine Überschrift der ersten Ebene
     st.write("# Gerätemanagement")
@@ -48,4 +48,4 @@ def ui_reservation_system():
     st.write("Session State:")
     st.session_state
 
-ui_reservation_system()
+ui_reservation_sys()

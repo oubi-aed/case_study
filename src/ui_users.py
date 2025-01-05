@@ -5,7 +5,7 @@ from queries import find_devices
 from devices import Device
 
 
-def ui_users():
+def ui_use():
 
     # Eine Überschrift der ersten Ebene
     st.write("# Gerätemanagement")
@@ -49,4 +49,4 @@ def ui_users():
     st.write("Session State:")
     st.session_state
 
-ui_users()
+ui_use()
