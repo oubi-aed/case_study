@@ -8,7 +8,7 @@ from devices import Device
 def ui_users():
 
     # Eine Überschrift der ersten Ebene
-    st.write("# Gerätemanagement")
+    st.write("# Nutzermanagement")
 
     # Eine Überschrift der zweiten Ebene
     st.write("## Geräteauswahl")
@@ -28,7 +28,7 @@ def ui_users():
             else:
                 st.error("Device not found in the database.")
 
-            with st.form("Device"):
+            with st.form(key="user_device_form"):
                 st.write(loaded_device.device_name)
 
                 text_input_val = st.text_input("Geräte-Verantwortlicher", value=loaded_device.managed_by_user_id)
