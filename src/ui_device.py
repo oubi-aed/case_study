@@ -9,41 +9,58 @@ def ui_device():
     # Eine Überschrift der ersten Ebene
     st.write("# Gerätemanagement")
 
-    # Eine Überschrift der zweiten Ebene
-    st.write("## Geräteauswahl")
+    # Auswahl der Aktion
+    action = st.selectbox("Aktion auswählen", ["Gerät anlegen/ändern", "Geräteauswahl"])
 
-    # Eine Auswahlbox mit Datenbankabfrage, das Ergebnis wird in current_device gespeichert
-    devices_in_db = find_devices()
+    if action == "Gerät anlegen/ändern":
+        st.write("## Neues Gerät anlegen oder bestehendes Gerät ändern")
 
-    if devices_in_db:
-        current_device_name = st.selectbox(
-            'Gerät auswählen',
-            options=devices_in_db, key="sbDevice_dev")
+        with st.form(key="device_form"):
+            device_name = st.text_input("Gerätename")
+            device_type = st.text_input("Gerätetyp")
+            device_location = st.text_input("Standort")
+            device_manager = st.text_input("Geräteverantwortlicher")
 
-        if current_device_name in devices_in_db:
-            loaded_device = Device.find_by_attribute("device_name", current_device_name)
-            if loaded_device:
-                st.write(f"Loaded Device: {loaded_device}")
-            else:
-                st.error("Device not found in the database.")
+            # Every form must have a submit button.
+            submitted = st.form_submit_button("Gerät speichern")
+            if submitted:
+                # Hier können Sie den Code hinzufügen, um die Gerätedaten zu speichern
+                st.write(f"Device {device_name} of type {device_type} located at {device_location} managed by {device_manager} has been saved.")
+                # Add code to save the device data to the database
 
-            with st.form("Device"):
-                st.write(loaded_device.device_name)
+    elif action == "Geräteauswahl":
+        st.write("## Geräteauswahl")
 
-                text_input_val = st.text_input("Geräte-Verantwortlicher", value=loaded_device.managed_by_user_id)
-                loaded_device.set_managed_by_user_id(text_input_val)
+        # Eine Auswahlbox mit Datenbankabfrage, das Ergebnis wird in current_device gespeichert
+        devices_in_db = find_devices()
 
-                # Every form must have a submit button.
-                submitted = st.form_submit_button("Submit")
-                if submitted:
-                    loaded_device.store_data()
-                    st.write("Data stored.")
-                    st.rerun()
+        if devices_in_db:
+            current_device_name = st.selectbox(
+                'Gerät auswählen',
+                options=devices_in_db, key="sbDevice_dev")
+
+            if current_device_name in devices_in_db:
+                loaded_device = Device.find_by_attribute("device_name", current_device_name)
+                if loaded_device:
+                    st.write(f"Loaded Device: {loaded_device}")
+                else:
+                    st.error("Device not found in the database.")
+
+                with st.form(key="update_device_form"):
+                    st.write(loaded_device.device_name)
+
+                    text_input_val = st.text_input("Geräte-Verantwortlicher", value=loaded_device.managed_by_user_id)
+                    loaded_device.set_managed_by_user_id(text_input_val)
+
+                    # Every form must have a submit button.
+                    submitted = st.form_submit_button("Submit")
+                    if submitted:
+                        loaded_device.store_data()
+                        st.write("Data stored.")
+                        st.rerun()
         else:
-            st.error("Selected device is not in the database.")
-    else:
-        st.write("No devices found.")
-        st.stop()
+            st.write("No devices found.")
+            st.stop()
 
     st.write("Session State:")
     st.session_state
