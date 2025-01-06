@@ -3,6 +3,7 @@
 import streamlit as st
 from queries import find_devices
 from devices import Device
+from maintenance_plan import MaintenancePlan
 
 
 def ui_maintenance_management():
@@ -33,10 +34,19 @@ def ui_maintenance_management():
             #laden des Textfeldes für Verantwortlichen
             with st.form(key="device_form"):
                 st.write(loaded_device.device_name)
-                #in value wird basierend auf Datenbank der eingegebene Wert gespeichert
-                text_input_val = st.text_input("Geräte-Verantwortlicher", value=loaded_device.managed_by_user_id)
-                #Aktualisiert das Gerätedatenobjekt mit dem neuen wert den der Benutzer eingegeben hat
-                loaded_device.set_managed_by_user_id(text_input_val)
+                
+                #st.write(f"Datum der ersten Wartung: {loaded_device.maintenance_plan.first_maintenance}")
+                #st.write(f"Datum der nächsten Wartung: {loaded_device.maintenance_plan.next_maintenance}")
+                #st.write(f"Wartungsintervall: {loaded_device.maintenance_plan._maintenance_interval}")
+                #st.write(f"Wartungskosten: {loaded_device.maintenance_plan._maintenance_cost}")  
+                #st.write(f"Wartungskosten: {loaded_device.maintenance_plan._maintenance_cost_per_quarter()}")              
+                
+                #nur für Frontend
+                st.write(f"Datum der ersten Wartung: Morgen")
+                st.write(f"Datum der nächsten Wartung: Morgen 2027")
+                st.write(f"Wartungsintervall: 2 Jahre")
+                st.write(f"Wartungskosten: teuer")
+                st.write(f"Wartungskosten pro Quartal: sehr euer")
 
                 # Every form must have a submit button.
                 submitted = st.form_submit_button("Submit")

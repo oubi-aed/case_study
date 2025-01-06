@@ -9,12 +9,19 @@ class Device():
     db_connector = TinyDB(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'database.json'), storage=serializer).table('devices')
 
     # Constructor
-    def __init__(self, device_name : str, managed_by_user_id : str):
+    def __init__(self, device_name : str, managed_by_user_id : str,     timeframe_device_reserved : str, reserved_by: str):
         self.device_name = device_name
         # The user id of the user that manages the device
         # We don't store the user object itself, but only the id (as a key)
         self.managed_by_user_id = managed_by_user_id
         self.is_active = True
+
+        #optionaler Parameter
+
+        self.timeframe_device_reserved = timeframe_device_reserved or ""
+        self.reserved_by = reserved_by or ""
+
+
         
     # String representation of the class
     def __str__(self):
@@ -54,6 +61,14 @@ class Device():
         """Expects `managed_by_user_id` to be a valid user id that exists in the database."""
         self.managed_by_user_id = managed_by_user_id
 
+    #Hinzugefügt um bei Reservierung Datum ein zu geben
+    def set_timeframe_device_reserved(self, timeframe_device_reserved: str):
+        self.timeframe_device_reserved = timeframe_device_reserved
+
+    #Benutzer welcher reserviert hat
+    def set_reserved_by(self, reserved_by: str):
+        self.reserved_by = reserved_by
+
     # Class method that can be called without an instance of the class to construct an instance of the class
     @classmethod
     def find_by_attribute(cls, by_attribute: str, attribute_value: str, num_to_return=1):
@@ -63,7 +78,7 @@ class Device():
 
         if result:
             data = result[:num_to_return]
-            device_results = [cls(d['device_name'], d['managed_by_user_id']) for d in data]
+            device_results = [cls(d['device_name'], d['managed_by_user_id'], d.get('timeframe_device_reserved', ""), d.get('reserved_by', "")) for d in data]
             return device_results if num_to_return > 1 else device_results[0]
         else:
             return None
@@ -73,7 +88,7 @@ class Device():
         # Load all data from the database and create instances of the Device class
         devices = []
         for device_data in Device.db_connector.all():
-            devices.append(Device(device_data['device_name'], device_data['managed_by_user_id']))
+            devices.append(Device(device_data['device_name'], device_data['managed_by_user_id'], [device_data.get('timeframe_device_reserved', ""), device_data.get('reserved_by', "")]))
         return devices
 
 
