@@ -7,10 +7,10 @@ from devices import Device
 def ui_reservation_system():
 
     # Eine Überschrift der ersten Ebene
-    st.write("# Gerätemanagement")
+    st.write("# Reservierungssystem")
 
     # Eine Überschrift der zweiten Ebene
-    st.write("## Geräteauswahl")
+    st.write("## Reserviere dein Gerät")
 
     # Eine Auswahlbox mit Datenbankabfrage, das Ergebnis wird in current_device gespeichert
     devices_in_db = find_devices()
@@ -30,8 +30,12 @@ def ui_reservation_system():
             with st.form(key="reservation_form"):
                 st.write(loaded_device.device_name)
 
-                text_input_val = st.text_input("Reservierungs-Verantwortlicher", value=loaded_device.managed_by_user_id)
-                loaded_device.set_managed_by_user_id(text_input_val)
+                text_input_val = st.text_input("Reserviert für:", value=loaded_device.reserved_by)
+                loaded_device.set_reserved_by(text_input_val)
+
+                text_input_reservation_time = st.text_input("reserviert von bis (dd,mm,yyyy-dd,mm,yyyy)", value=loaded_device.timeframe_device_reserved)
+                loaded_device.set_timeframe_device_reserved(text_input_reservation_time)
+
 
                 # Every form must have a submit button.
                 submitted = st.form_submit_button("Submit")
