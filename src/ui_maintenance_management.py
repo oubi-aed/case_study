@@ -32,7 +32,7 @@ def ui_maintenance_management():
                 st.error("Device not found in the database.")
 
             #laden des Textfeldes für Verantwortlichen
-            with st.form(key="device_form"):
+            with st.form(key="maintenance_form"):
                 st.write(loaded_device.device_name)
                 
                 #st.write(f"Datum der ersten Wartung: {loaded_device.maintenance_plan.first_maintenance}")
