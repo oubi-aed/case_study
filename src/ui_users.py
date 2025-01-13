@@ -44,8 +44,8 @@ def ui_users():
                 else:
                     st.error("Device not found in the database.")
 
-                with st.form("Device"):
-                    st.write(loaded_device.device_name)  # Direct access to attributes
+                with st.form(key="user_device_form"):
+                    st.write(loaded_device.device_name)
 
                     text_input_val = st.text_input("Geräte-Verantwortlicher", value=loaded_device.managed_by_user_id)
                     loaded_device.set_managed_by_user_id(text_input_val)  # Uses setter method
