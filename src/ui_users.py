@@ -1,7 +1,7 @@
 #to start the Server with Git Bash you have to type in: python -m streamlit run src/ui_users.py
 
 import streamlit as st
-from queries import find_devices
+from queries import find_devices, store_user_data
 from devices import Device
 
 def ui_users():
@@ -22,9 +22,8 @@ def ui_users():
             # Every form must have a submit button.
             submitted = st.form_submit_button("Nutzer anlegen")
             if submitted:
-                # Hier können Sie den Code hinzufügen, um die Benutzerdaten zu speichern
+                store_user_data(user_name, user_email, user_role)
                 st.write(f"User {user_name} with email {user_email} and role {user_role} has been created.")
-                # Add code to save the user data to the database
 
     elif action == "Geräteauswahl":
         st.write("## Geräteauswahl")
@@ -35,20 +34,21 @@ def ui_users():
         if devices_in_db:
             current_device_name = st.selectbox(
                 'Gerät auswählen',
-                options=devices_in_db, key="sbDevice_users")
+                options=devices_in_db, key="sbDevice")
 
             if current_device_name in devices_in_db:
-                loaded_device = Device.find_by_attribute("device_name", current_device_name)
+                loaded_device = Device.load_data_by_device_name(current_device_name)
                 if loaded_device:
-                    st.write(f"Loaded Device: {loaded_device}")
+                    st.session_state['current_device'] = loaded_device
+                    st.write(f"Loaded Device: {loaded_device}")  # uses __str__ method
                 else:
                     st.error("Device not found in the database.")
 
-                with st.form(key="user_device_form"):
-                    st.write(loaded_device.device_name)
+                with st.form("Device"):
+                    st.write(loaded_device.device_name)  # Direct access to attributes
 
                     text_input_val = st.text_input("Geräte-Verantwortlicher", value=loaded_device.managed_by_user_id)
-                    loaded_device.set_managed_by_user_id(text_input_val)
+                    loaded_device.set_managed_by_user_id(text_input_val)  # Uses setter method
 
                     # Every form must have a submit button.
                     submitted = st.form_submit_button("Submit")

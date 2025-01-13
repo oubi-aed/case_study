@@ -15,5 +15,15 @@ def find_devices() -> list:
     
     return result
 
+def store_user_data(user_name: str, user_email: str, user_role: str):
+    """Store user data in the database."""
+    db_connector = TinyDB(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'database.json')).table('users')
+    user_data = {
+        "user_name": user_name,
+        "user_email": user_email,
+        "user_role": user_role
+    }
+    db_connector.insert(user_data)
+
 if __name__ == "__main__":
     print(find_devices())

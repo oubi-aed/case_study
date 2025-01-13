@@ -18,15 +18,16 @@ def ui_device():
         with st.form(key="device_form"):
             device_name = st.text_input("Gerätename")
             device_type = st.text_input("Gerätetyp")
-            device_location = st.text_input("Standort")
             device_manager = st.text_input("Geräteverantwortlicher")
+            timeframe_device_reserved = st.text_input("Reservierungszeitraum")
+            reserved_by = st.text_input("Reserviert von")
 
             # Every form must have a submit button.
             submitted = st.form_submit_button("Gerät speichern")
             if submitted:
-                # Hier können Sie den Code hinzufügen, um die Gerätedaten zu speichern
-                st.write(f"Device {device_name} of type {device_type} located at {device_location} managed by {device_manager} has been saved.")
-                # Add code to save the device data to the database
+                new_device = Device(device_name, device_manager, timeframe_device_reserved, reserved_by)
+                new_device.store_data()
+                st.write(f"Device {device_name} has been saved.")
 
     elif action == "Geräteauswahl":
         st.write("## Geräteauswahl")
