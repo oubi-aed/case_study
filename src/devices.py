@@ -2,6 +2,7 @@ import os
 
 from tinydb import TinyDB, Query
 from serializer import serializer
+from datetime import datetime, date
 
 
 class Device():
@@ -9,7 +10,7 @@ class Device():
     db_connector = TinyDB(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'database.json'), storage=serializer).table('devices')
 
     # Constructor
-    def __init__(self, device_name : str, managed_by_user_id : str, last_maintenance_date: str, maintenance_cost: str, maintenance_frequency: str, reserved_by: str = ""):
+    def __init__(self, device_name: str, managed_by_user_id: str, last_maintenance_date: str, maintenance_cost: str, maintenance_frequency: str, reserved_by: str = "", timeframe_device_reserved_start=None, timeframe_device_reserved_end=None):
         self.device_name = device_name
         # The user id of the user that manages the device
         # We don't store the user object itself, but only the id (as a key)
@@ -19,7 +20,15 @@ class Device():
         self.maintenance_cost = maintenance_cost or ""
         self.maintenance_frequency = maintenance_frequency or ""
         self.reserved_by = reserved_by
+        self.timeframe_device_reserved_start = self.convert_to_date(timeframe_device_reserved_start) 
+        self.timeframe_device_reserved_end = self.convert_to_date(timeframe_device_reserved_end)
 
+    def convert_to_date(self, date_str):
+        if isinstance(date_str, date):
+            return date_str
+        if date_str:
+            return datetime.strptime(date_str, '%Y-%m-%d')
+        return None
         
     # String representation of the class
     def __str__(self):
@@ -60,8 +69,11 @@ class Device():
         self.managed_by_user_id = managed_by_user_id
 
     #Hinzugefügt um bei Reservierung Datum ein zu geben
-    def set_timeframe_device_reserved(self, timeframe_device_reserved: str):
-        self.timeframe_device_reserved = timeframe_device_reserved
+    def set_timeframe_device_reserved_start(self, start_date):
+        self.timeframe_device_reserved_start = self.convert_to_date(start_date)
+
+    def set_timeframe_device_reserved_end(self, end_date):
+        self.timeframe_device_reserved_end = self.convert_to_date(end_date)
 
     #Benutzer welcher reserviert hat
     def set_reserved_by(self, reserved_by: str):
@@ -76,8 +88,9 @@ class Device():
 
         if result:
             data = result[:num_to_return]
-            device_results = [cls(d['device_name'], d['managed_by_user_id'], d.get('last_maintenance_date', ""), d.get('maintenance_cost', ""), d.get('maintenance_frequency', ""), d.get('reserved_by', "")) for d in data]
+            device_results = [cls(d['device_name'], d['managed_by_user_id'], d.get('last_maintenance_date', ""), d.get('maintenance_cost', ""), d.get('maintenance_frequency', ""), d.get('reserved_by', ""),d.get('timeframe_device_reserved_start', None), d.get('timeframe_device_reserved_end', None) ) for d in data]
             return device_results if num_to_return > 1 else device_results[0]
+        
         else:
             return None
 
@@ -86,7 +99,7 @@ class Device():
         # Load all data from the database and create instances of the Device class
         devices = []
         for device_data in Device.db_connector.all():
-            devices.append(Device(device_data['device_name'], device_data['managed_by_user_id'], device_data.get('last_maintenance_date', ""), device_data.get('maintenance_cost', ""), device_data.get('maintenance_frequency', ""), device_data.get('reserved_by', "")))
+            devices.append(Device(device_data['device_name'], device_data['managed_by_user_id'], device_data.get('last_maintenance_date', ""), device_data.get('maintenance_cost', ""), device_data.get('maintenance_frequency', ""), device_data.get('reserved_by', ""), device_data.get('timeframe_device_reserved_start', None), device_data.get('timeframe_device_reserved_end', None)))
         return devices
 
 

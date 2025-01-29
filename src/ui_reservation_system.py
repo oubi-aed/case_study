@@ -3,6 +3,7 @@
 import streamlit as st
 from queries import find_devices
 from devices import Device
+from datetime import datetime
 
 def ui_reservation_system():
 
@@ -28,12 +29,21 @@ def ui_reservation_system():
                 st.error("Device not found in the database.")
 
             with st.form(key="reservation_form"):
-                st.write(loaded_device.device_name)
+                reserviert_fuer = st.text_input("Reserviert für:", value=loaded_device.reserved_by or "")
+                loaded_device.set_reserved_by(reserviert_fuer)
 
-                text_input_val = st.text_input("Reserviert für:", value=loaded_device.reserved_by)
-                loaded_device.set_reserved_by(text_input_val)
+                # Standardwerte für die Datumsauswahl setzen
+                default_start = loaded_device.timeframe_device_reserved_start or datetime.today().date()
+                default_end = loaded_device.timeframe_device_reserved_end or datetime.today().date()
 
-                # Every form must have a submit button.
+                # Kalender für Start- und Enddatum
+                timeframe_device_reservation_start = st.date_input("Reserviert von:", value=default_start, min_value=datetime.today().date())
+                loaded_device.set_timeframe_device_reserved_start(timeframe_device_reservation_start)
+
+                timeframe_device_reservation_end = st.date_input("Reserviert bis:", value=default_end, min_value=datetime.today().date())
+                loaded_device.set_timeframe_device_reserved_end(timeframe_device_reservation_end)
+
+
                 submitted = st.form_submit_button("Submit")
                 if submitted:
                     loaded_device.store_data()

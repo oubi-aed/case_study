@@ -25,5 +25,6 @@ def store_user_data(user_name: str, user_email: str, user_role: str):
     }
     db_connector.insert(user_data)
 
+
 if __name__ == "__main__":
     print(find_devices())
