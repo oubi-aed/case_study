@@ -1,8 +1,7 @@
 import os
-
+from datetime import datetime, date
 from tinydb import TinyDB, Query
 from serializer import serializer
-from datetime import datetime, date
 
 
 class Device():
@@ -10,124 +9,63 @@ class Device():
     db_connector = TinyDB(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'database.json'), storage=serializer).table('devices')
 
     # Constructor
-    def __init__(self, device_name: str, managed_by_user_id: str, last_maintenance_date: str, maintenance_cost: str, maintenance_frequency: str, reserved_by: str = "", timeframe_device_reserved_start=None, timeframe_device_reserved_end=None):
+    def __init__(self, device_name: str, managed_by_user_id: str, last_maintenance_date: str, maintenance_cost: str, maintenance_frequency: str, reserved_by: str = "", reservations=None):
         self.device_name = device_name
-        # The user id of the user that manages the device
-        # We don't store the user object itself, but only the id (as a key)
         self.managed_by_user_id = managed_by_user_id
         self.is_active = True
         self.last_maintenance_date = last_maintenance_date or ""
         self.maintenance_cost = maintenance_cost or ""
         self.maintenance_frequency = maintenance_frequency or ""
         self.reserved_by = reserved_by
-        self.timeframe_device_reserved_start = self.convert_to_date(timeframe_device_reserved_start) 
-        self.timeframe_device_reserved_end = self.convert_to_date(timeframe_device_reserved_end)
+        self.reservations = reservations if reservations is not None else []
 
-    def convert_to_date(self, date_str):
-        if isinstance(date_str, date):
-            return date_str
-        if date_str:
-            return datetime.strptime(date_str, '%Y-%m-%d')
-        return None
-        
-    # String representation of the class
-    def __str__(self):
-        return f'Device (Object) {self.device_name} ({self.managed_by_user_id})'
+    def add_reservation(self, reserved_by, start_date, end_date):
+        reservation = {
+            "reserved_by": reserved_by,
+            "start_date": start_date,
+            "end_date": end_date
+        }
+        self.reservations.append(reservation)
 
-    # String representation of the class
-    def __repr__(self):
-        return self.__str__()
-    
     def store_data(self):
         print("Storing data...")
-        # Check if the device already exists in the database
         DeviceQuery = Query()
         result = self.db_connector.search(DeviceQuery.device_name == self.device_name)
         if result:
-            # Update the existing record with the current instance's data
-            result = self.db_connector.update(self.__dict__, doc_ids=[result[0].doc_id])
+            self.db_connector.update(self.__dict__, doc_ids=[result[0].doc_id])
             print("Data updated.")
         else:
-            # If the device doesn't exist, insert a new record
             self.db_connector.insert(self.__dict__)
             print("Data inserted.")
-    
-    def delete(self):
-        print("Deleting data...")
-        # Check if the device exists in the database
-        DeviceQuery = Query()
-        result = self.db_connector.search(DeviceQuery.device_name == self.device_name)
-        if result:
-            # Delete the record from the database
-            self.db_connector.remove(doc_ids=[result[0].doc_id])
-            print("Data deleted.")
-        else:
-            print("Data not found.")
 
-    def set_managed_by_user_id(self, managed_by_user_id: str):
-        """Expects `managed_by_user_id` to be a valid user id that exists in the database."""
-        self.managed_by_user_id = managed_by_user_id
-
-    #Hinzugefügt um bei Reservierung Datum ein zu geben
-    def set_timeframe_device_reserved_start(self, start_date):
-        self.timeframe_device_reserved_start = self.convert_to_date(start_date)
-
-    def set_timeframe_device_reserved_end(self, end_date):
-        self.timeframe_device_reserved_end = self.convert_to_date(end_date)
-
-    #Benutzer welcher reserviert hat
-    def set_reserved_by(self, reserved_by: str):
-        self.reserved_by = reserved_by
-
-    # Class method that can be called without an instance of the class to construct an instance of the class
     @classmethod
     def find_by_attribute(cls, by_attribute: str, attribute_value: str, num_to_return=1):
-        # Load data from the database and create an instance of the Device class
         DeviceQuery = Query()
         result = cls.db_connector.search(DeviceQuery[by_attribute] == attribute_value)
-
         if result:
             data = result[:num_to_return]
-            device_results = [cls(d['device_name'], d['managed_by_user_id'], d.get('last_maintenance_date', ""), d.get('maintenance_cost', ""), d.get('maintenance_frequency', ""), d.get('reserved_by', ""),d.get('timeframe_device_reserved_start', None), d.get('timeframe_device_reserved_end', None) ) for d in data]
+            device_results = [cls(d['device_name'], d['managed_by_user_id'], d.get('last_maintenance_date', ""), d.get('maintenance_cost', ""), d.get('maintenance_frequency', ""), d.get('reserved_by', ""), d.get('reservations', [])) for d in data]
             return device_results if num_to_return > 1 else device_results[0]
-        
         else:
             return None
 
     @classmethod
     def find_all(cls) -> list:
-        # Load all data from the database and create instances of the Device class
         devices = []
         for device_data in Device.db_connector.all():
-            devices.append(Device(device_data['device_name'], device_data['managed_by_user_id'], device_data.get('last_maintenance_date', ""), device_data.get('maintenance_cost', ""), device_data.get('maintenance_frequency', ""), device_data.get('reserved_by', ""), device_data.get('timeframe_device_reserved_start', None), device_data.get('timeframe_device_reserved_end', None)))
+            devices.append(Device(device_data['device_name'], device_data['managed_by_user_id'], device_data.get('last_maintenance_date', ""), device_data.get('maintenance_cost', ""), device_data.get('maintenance_frequency', ""), device_data.get('reserved_by', ""), device_data.get('reservations', [])))
         return devices
 
 
-
-    
-
 if __name__ == "__main__":
-    # Create a device
     device1 = Device("Device1", "one@mci.edu", "", "", "")
-    device2 = Device("Device2", "two@mci.edu", "", "", "") 
-    device3 = Device("Device3", "two@mci.edu", "", "", "") 
-    device4 = Device("Device4", "two@mci.edu", "", "", "") 
     device1.store_data()
-    device2.store_data()
-    device3.store_data()
-    device4.store_data()
-    device5 = Device("Device3", "four@mci.edu", "", "", "") 
-    device5.store_data()
-
-    #loaded_device = Device.find_by_attribute("device_name", "Device2")
-    loaded_device = Device.find_by_attribute("managed_by_user_id", "two@mci.edu")
+    loaded_device = Device.find_by_attribute("device_name", "Device1")
     if loaded_device:
         print(f"Loaded Device: {loaded_device}")
     else:
         print("Device not found.")
-
     devices = Device.find_all()
     print("All devices:")
     for device in devices:
         print(device)
-
