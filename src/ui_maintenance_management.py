@@ -4,7 +4,15 @@ import streamlit as st
 from queries import find_devices
 from devices import Device
 from maintenance_plan import MaintenancePlan
+from datetime import datetime, timedelta
 
+def get_next_maintenance_date(last_maintenance_date, maintenance_frequency):
+    # Dummy implementation, replace with actual logic
+    return last_maintenance_date + timedelta(days=365 // maintenance_frequency)
+
+def calculate_quarterly_costs(maintenance_cost, maintenance_frequency):
+    # Dummy implementation, replace with actual logic
+    return maintenance_cost / 4
 
 def ui_maintenance_management():
 
@@ -35,18 +43,19 @@ def ui_maintenance_management():
             with st.form(key="maintenance_form"):
                 st.write(loaded_device.device_name)
                 
-                #st.write(f"Datum der ersten Wartung: {loaded_device.maintenance_plan.first_maintenance}")
-                #st.write(f"Datum der nächsten Wartung: {loaded_device.maintenance_plan.next_maintenance}")
-                #st.write(f"Wartungsintervall: {loaded_device.maintenance_plan._maintenance_interval}")
-                #st.write(f"Wartungskosten: {loaded_device.maintenance_plan._maintenance_cost}")  
-                #st.write(f"Wartungskosten: {loaded_device.maintenance_plan._maintenance_cost_per_quarter()}")              
-                
-                #nur für Frontend
-                st.write(f"Datum der ersten Wartung: Morgen")
-                st.write(f"Datum der nächsten Wartung: Morgen 2027")
-                st.write(f"Wartungsintervall: 2 Jahre")
-                st.write(f"Wartungskosten: teuer")
-                st.write(f"Wartungskosten pro Quartal: sehr euer")
+                # Ensure last_maintenance_date attribute exists
+                if hasattr(loaded_device, 'last_maintenance_date') and loaded_device.last_maintenance_date:
+                    try:
+                        last_maintenance_date = datetime.strptime(loaded_device.last_maintenance_date, '%d.%m.%Y')
+                        next_maintenance_date = get_next_maintenance_date(last_maintenance_date, int(loaded_device.maintenance_frequency))
+                        st.write(f"Nächster Wartungstermin: {next_maintenance_date.strftime('%d.%m.%Y')}")
+
+                        quarterly_costs = calculate_quarterly_costs(float(loaded_device.maintenance_cost), int(loaded_device.maintenance_frequency))
+                        st.write(f"Wartungskosten pro Quartal: {quarterly_costs:.2f} EUR")
+                    except ValueError:
+                        st.error("Invalid date format for last maintenance date. Please use dd.mm.yyyy.")
+                else:
+                    st.error("Device does not have a last maintenance date.")
 
                 # Every form must have a submit button.
                 submitted = st.form_submit_button("Submit")
