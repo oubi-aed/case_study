@@ -27,6 +27,12 @@ class Device():
         }
         self.reservations.append(reservation)
 
+    def is_reserved(self, start_date, end_date):
+        for reservation in self.reservations:
+            if (start_date <= reservation['end_date'] and end_date >= reservation['start_date']):
+                return True
+        return False
+
     def store_data(self):
         print("Storing data...")
         DeviceQuery = Query()

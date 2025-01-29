@@ -31,10 +31,13 @@ def ui_reservation_system():
 
                 submitted = st.form_submit_button("Reservierung speichern")
                 if submitted:
-                    loaded_device.add_reservation(reserviert_fuer, timeframe_device_reservation_start, timeframe_device_reservation_end)
-                    loaded_device.store_data()
-                    st.success("Reservierung erfolgreich gespeichert!")
-                    st.rerun()
+                    if loaded_device.is_reserved(timeframe_device_reservation_start, timeframe_device_reservation_end):
+                        st.error("Das Gerät ist in diesem Zeitraum bereits reserviert.")
+                    else:
+                        loaded_device.add_reservation(reserviert_fuer, timeframe_device_reservation_start, timeframe_device_reservation_end)
+                        loaded_device.store_data()
+                        st.success("Reservierung erfolgreich gespeichert!")
+                        st.rerun()
         else:
             st.error("Selected device is not in the database.")
     else:
